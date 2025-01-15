@@ -31,7 +31,7 @@ public:
 			ImGui::Image(image->GetDescriptorSet(), { 48, 48 });
 
 			ImGui::SameLine();
-			Walnut::UI::ShiftCursorX(20.0f);
+			Walnut::UI::ShiftCursorX(20.0f); 
 
 			ImGui::BeginGroup();
 			ImGui::Text("Walnut application framework");
