@@ -33,7 +33,7 @@
 
 #.vs files
 .vs/*
-.Cubed-Server/.vs/
+Cubed-Server/.vs/
 
 #bin(binary) files
 bin/*
