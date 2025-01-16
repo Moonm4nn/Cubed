@@ -1,9 +1,11 @@
-#include "Walnut/Input/Input.h"
-
 #include "ClientLayer.h"
+
+#include "Walnut/Input/Input.h"
+#include "Walnut/ImGui/ImGuiTheme.h"
 
 #include "imgui.h"
 #include "imgui_internal.h" //why does this need to be defined when it has been defined in the build files
+#include "misc/cpp/imgui_stdlib.h"
 
 namespace Cubed {
 
@@ -18,7 +20,7 @@ namespace Cubed {
 
 	void ClientLayer::OnAttach()
 	{
-
+		m_Client.SetDataReceivedCallback([this](const Walnut::Buffer buffer) { OnDataReceived(buffer); });
 	}
 
 	void ClientLayer::OnDetach()
@@ -28,6 +30,9 @@ namespace Cubed {
 
 	void ClientLayer::OnUpdate(float ts)
 	{
+		if (m_Client.GetConnectionStatus() != Walnut::Client::ConnectionStatus::Connected)
+			return;
+
 		glm::vec2 dir{ 0.0f, 0.0f };
 
 		if (Walnut::Input::IsKeyDown(Walnut::KeyCode::W))
@@ -55,9 +60,40 @@ namespace Cubed {
 
 	void ClientLayer::OnUIRender() 
 	{
-		ImGui::ShowDemoWindow();
-		DrawRect(m_PlayerPosition, { 50.0f, 50.0f }, 0xffff00ff);
+		Walnut::Client::ConnectionStatus connectionStatus = m_Client.GetConnectionStatus();
+		if (connectionStatus == Walnut::Client::ConnectionStatus::Connected)
+		{
+			DrawRect(m_PlayerPosition, { 50.0f, 50.0f }, 0xffff00ff);
+		}
+		else
+		{
+			bool readOnly = connectionStatus == Walnut::Client::ConnectionStatus::Connected;
+			ImGui::Begin("Connect to Server");
 
+			ImGui::InputText("Server address", &m_ServerAddress);
+			if (connectionStatus != Walnut::Client::ConnectionStatus::Connected)
+			{
+				if (connectionStatus == Walnut::Client::ConnectionStatus::Connecting) {
+					ImGui::TextColored(ImColor(Walnut::UI::Colors::Theme::validPrefab), "Connecting...");
+				}
+				else
+				{
+					ImGui::TextColored(ImColor(Walnut::UI::Colors::Theme::invalidPrefab), "Failed to Connect or Disconnected");
+				}
+			}
+			
+			if (ImGui::Button("Connect")) 
+			{
+				m_Client.ConnectToServer(m_ServerAddress);
+			}
+
+			ImGui::End();
+		}
+		//ImGui::ShowDemoWindow();
 	}
 
+	void ClientLayer::OnDataReceived(const Walnut::Buffer buffer) 
+	{
+
+	}
 }

@@ -3,6 +3,8 @@
 #include "Walnut/Layer.h"
 #include "Walnut/Application.h"
 
+#include "Walnut/Networking/Client.h"
+
 #include <glm/glm.hpp>
 
 namespace Cubed {
@@ -17,8 +19,15 @@ namespace Cubed {
 		virtual void OnUIRender() override;
 
 	private:
+
+		void OnDataReceived(const Walnut::Buffer buffer);
+
+	private:
 		glm::vec2 m_PlayerPosition = { 50,50 };
 		glm::vec2 m_PlayerVelocity = { 0,0 };
+
+		std::string m_ServerAddress = "127.0.0.1:1000";
+		Walnut::Client m_Client;
 	};
 
 }
